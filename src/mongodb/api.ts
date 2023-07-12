@@ -1,9 +1,8 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { env } from "node:process";
 import dotenv from "dotenv";
 dotenv.config();
 
-const uri = env.MONGO_DB_URI ?? null;
+const uri = process.env.MONGO_DB_URI ?? null;
 if (uri == null) {
   throw new Error("MONGO_DB_URI is not set");
 }
