@@ -1,4 +1,5 @@
-import client from "../../mongodb/api";
+import client from "../mongodb/api";
+
 export class Folder {
   private static db = client.db(process.env.MONGO_DB_NAME);
   private static collection = this.db.collection(
