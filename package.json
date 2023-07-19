@@ -20,6 +20,9 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@fastify/swagger": "^8.8.0",
+    "@fastify/swagger-ui": "^1.9.2",
     "dotenv": "^16.3.1",
     "fastify": "^4.19.2",
     "mongodb": "^5.7.0"

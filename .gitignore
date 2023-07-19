@@ -2,3 +2,5 @@
 src/mongodb/playground-1.mongodb.js
 node_modules
 .vercel
+http.rest
+src/test.ts
