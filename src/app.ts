@@ -23,7 +23,7 @@ export default async function (
 ) {
   instance.register(fastifySwagger, {
     swagger: {
-      schemes: ["http"],
+      schemes: ["https"],
       consumes: ["application/json"],
       produces: ["application/json"],
       info: {
@@ -66,7 +66,6 @@ export default async function (
   instance.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
   instance.addSchema({ $id: "paramsImage", ...paramsImageSchema });
   instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
-
   instance.register(imageRoutes);
   instance.register(folderRoutes);
   // instance.get("/", async (req: FastifyRequest, res: FastifyReply) => {

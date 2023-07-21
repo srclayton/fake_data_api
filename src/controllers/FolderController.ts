@@ -8,6 +8,9 @@ export class FolderController {
     if (!folders) {
       reply.code(404).send({ error: "Not Found" });
     }
-    reply.code(200).send(folders);
+    reply.code(200).send({
+      total_items: Object.keys(folders).length,
+      items: folders,
+    });
   }
 }

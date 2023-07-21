@@ -36,8 +36,8 @@ export class Image {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const response = await this.collection
-        .find({ folder })
-        .sort({ title: 1 })
+        .find({ folder_id: folder })
+        .sort({ filename: 1 })
         .toArray();
       return response;
     } catch (error) {

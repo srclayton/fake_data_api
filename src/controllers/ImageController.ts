@@ -8,7 +8,11 @@ export class ImageController {
     if (!images) {
       reply.code(404).send({ error: "Not Found" });
     }
-    reply.code(200).send(images);
+
+    reply.code(200).send({
+      total_items: Object.keys(images).length,
+      items: images,
+    });
   }
 
   public async getById(request: FastifyRequest, reply: FastifyReply) {
@@ -28,6 +32,9 @@ export class ImageController {
     if (!images) {
       reply.code(404).send({ error: "Not Found" });
     }
-    reply.code(200).send(images);
+    reply.code(200).send({
+      total_items: Object.keys(images).length,
+      items: images,
+    });
   }
 }

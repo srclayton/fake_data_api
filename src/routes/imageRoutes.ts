@@ -13,9 +13,12 @@ export default async (fastify: FastifyInstance) => {
         tags: ["images"],
         response: {
           200: {
-            description: "Succesful response",
-            type: "array",
-            items: { $ref: "Image#" },
+            description: "Successful response",
+            type: "object",
+            properties: {
+              total_items: { type: "number" },
+              items: { type: "array", items: { $ref: "Image#" } },
+            },
           },
         },
       },
@@ -33,7 +36,7 @@ export default async (fastify: FastifyInstance) => {
         tags: ["images"],
         response: {
           200: {
-            description: "Succesful response",
+            description: "Successful response",
             type: "object",
             $ref: "Image#",
           },
@@ -56,10 +59,11 @@ export default async (fastify: FastifyInstance) => {
         tags: ["images", "folder"],
         response: {
           200: {
-            description: "Succesful response",
-            type: "array",
-            items: {
-              $ref: "ImageByFolder#",
+            description: "Successful response",
+            type: "object",
+            properties: {
+              total_items: { type: "number" },
+              items: { type: "array", items: { $ref: "ImageByFolder#" } },
             },
           },
         },

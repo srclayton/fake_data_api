@@ -24,7 +24,7 @@ const fastify = Fastify({
 
 fastify.register(fastifySwagger, {
   swagger: {
-    schemes: ["http"],
+    schemes: ["https", "http"],
     consumes: ["application/json"],
     produces: ["application/json"],
     info: {

@@ -17,9 +17,12 @@ export default async (fastify: FastifyInstance) => {
         tags: ["folder"],
         response: {
           200: {
-            description: "Succesful response",
-            type: "array",
-            items: { $ref: "Folder#" },
+            description: "Successful response",
+            type: "object",
+            properties: {
+              total_items: { type: "number" },
+              items: { type: "array", items: { $ref: "Folder#" } },
+            },
           },
         },
       },
