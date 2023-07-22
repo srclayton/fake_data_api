@@ -1,13 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { FolderController } from "../controllers/FolderController";
+import { GenericController } from "../controllers/GenericController";
 
 export default async (fastify: FastifyInstance) => {
-  const folderController = new FolderController();
+  const folderController = new GenericController("folder");
 
-  fastify.get("/onRequest", async (request, reply) => {
-    const ip = request.headers["x-forwarded-for"] || request.ip;
-    reply.send(`Hello, your IP address is ${ip}`);
-  });
   fastify.get(
     "/folder",
     {
@@ -29,5 +25,28 @@ export default async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest, reply: FastifyReply) =>
       folderController.getAll(request, reply)
+  );
+
+  fastify.get(
+    "/folder/:id",
+    {
+      schema: {
+        description:
+          "Nesta rota, é possível obter informações detalhadas de uma pasta específica, fornecendo o ID correspondente na URL.",
+        tags: ["folder"],
+        response: {
+          200: {
+            description: "Successful response",
+            type: "object",
+            $ref: "Folder#",
+          },
+        },
+        params: {
+          $ref: "paramsFolderSchema#",
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) =>
+      folderController.getById(request, reply)
   );
 };

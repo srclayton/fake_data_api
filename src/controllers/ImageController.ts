@@ -1,40 +1,24 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Image } from "../models/Image";
+import { GenericController } from "./GenericController";
 
-export class ImageController {
-  public async getAll(request: FastifyRequest, reply: FastifyReply) {
-    const images = await Image.getAll();
-
-    if (!images) {
-      reply.code(404).send({ error: "Not Found" });
-    }
-
-    reply.code(200).send({
-      total_items: Object.keys(images).length,
-      items: images,
-    });
-  }
-
-  public async getById(request: FastifyRequest, reply: FastifyReply) {
-    const { id } = request.params as { id: string };
-    const image = await Image.getById(id);
-
-    if (!image) {
-      reply.code(404).send({ error: "Not Found" });
-    }
-    reply.code(200).send(image);
-  }
-
+export class ImageController extends GenericController {
   public async getByFolder(request: FastifyRequest, reply: FastifyReply) {
     const { folder } = request.params as { folder: string };
-    const images = await Image.getByFolder(folder);
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const images = await this.model.getByFolder(folder);
 
-    if (!images) {
-      reply.code(404).send({ error: "Not Found" });
+      if (!images) {
+        reply.code(404).send({ error: "Not Found" });
+      }
+      reply.code(200).send({
+        total_items: await this.model.getCountDocuments(folder),
+        items: images,
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    reply.code(200).send({
-      total_items: Object.keys(images).length,
-      items: images,
-    });
   }
 }

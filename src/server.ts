@@ -11,8 +11,9 @@ import {
   replyImageByFolderSchema,
   paramsImageSchema,
   paramsImageByFolderSchema,
+  paramsImageByPage,
 } from "./schemas/image";
-import { replyFolderSchema } from "./schemas/folder";
+import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
 
 const fastify = Fastify({
   logger: pino({
@@ -67,13 +68,15 @@ fastify.addSchema({ $id: "Folder", ...replyFolderSchema });
 fastify.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
 fastify.addSchema({ $id: "paramsImage", ...paramsImageSchema });
 fastify.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
+fastify.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+fastify.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
 
 fastify.register(cors, {
   origin: true,
 });
 
-fastify.register(imageRoutes);
-fastify.register(folderRoutes);
+fastify.register(imageRoutes, { prefix: "/api/v1" });
+fastify.register(folderRoutes, { prefix: "/api/v1" });
 
 // fastify.get("/", (request, reply) => {
 //   reply.send({ hello: "world" });

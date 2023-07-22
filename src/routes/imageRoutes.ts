@@ -2,8 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { ImageController } from "../controllers/ImageController";
 
 export default async (fastify: FastifyInstance) => {
-  const imageController = new ImageController();
-
+  const imageController = new ImageController("image");
   fastify.get(
     "/images",
     {
@@ -74,5 +73,37 @@ export default async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest, reply: FastifyReply) =>
       imageController.getByFolder(request, reply)
+  );
+
+  fastify.get(
+    "/images/page/:page",
+    {
+      schema: {
+        tags: ["images"],
+        description:
+          "Quando um cliente faz uma solicitação GET para esta rota, o servidor retorna uma página de imagens, onde o número de imagens por página é determinado anteriormente.",
+        response: {
+          200: {
+            description: "Successful response",
+            type: "object",
+            properties: {
+              current_page: { type: "number" },
+              current_items: { type: "number" },
+              total_pages: { type: "number" },
+              total_items: { type: "number" },
+              items: {
+                type: "array",
+                items: { $ref: "Image#" },
+              },
+            },
+          },
+        },
+        params: {
+          $ref: "paramsPage#",
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) =>
+      imageController.getByPage(request, reply)
   );
 };

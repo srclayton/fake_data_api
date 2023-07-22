@@ -1,4 +1,4 @@
-import {
+import fastify, {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyServerOptions,
@@ -13,8 +13,9 @@ import {
   replyImageByFolderSchema,
   paramsImageSchema,
   paramsImageByFolderSchema,
+  paramsImageByPage,
 } from "./schemas/image";
-import { replyFolderSchema } from "./schemas/folder";
+import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
 
 export default async function (
   instance: FastifyInstance,
@@ -60,14 +61,17 @@ export default async function (
     },
     transformSpecificationClone: true,
   });
-
   instance.addSchema({ $id: "Image", ...replyImageSchema });
   instance.addSchema({ $id: "Folder", ...replyFolderSchema });
   instance.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
   instance.addSchema({ $id: "paramsImage", ...paramsImageSchema });
   instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
-  instance.register(imageRoutes);
-  instance.register(folderRoutes);
+  instance.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+  instance.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
+
+  instance.register(imageRoutes, { prefix: "/api/v1" });
+  instance.register(folderRoutes, { prefix: "/api/v1" });
+
   // instance.get("/", async (req: FastifyRequest, res: FastifyReply) => {
   //   res.status(200).send({
   //     hello: "World",

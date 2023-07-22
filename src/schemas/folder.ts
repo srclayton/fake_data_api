@@ -6,3 +6,13 @@ export const replyFolderSchema = {
   },
   required: ["_id", "folder_name"],
 };
+export const paramsFolderSchema = {
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      format: "uuid",
+      description: "ID da pasta",
+    },
+  },
+};
