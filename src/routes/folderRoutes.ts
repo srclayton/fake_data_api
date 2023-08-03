@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { GenericController } from "../controllers/GenericController";
+import { Controller } from "../controllers/Controller";
 
 export default async (fastify: FastifyInstance) => {
-  const folderController = new GenericController("folder");
+  const folderController = new Controller("folder");
 
   fastify.get(
     "/folder",

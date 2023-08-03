@@ -3,17 +3,27 @@ import pino from "pino";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import cors from "@fastify/cors";
+import jwt from "@fastify/jwt";
 
 import folderRoutes from "./routes/folderRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import {
-  replyImageSchema,
   replyImageByFolderSchema,
   paramsImageSchema,
   paramsImageByFolderSchema,
   paramsImageByPage,
+  replyImageSchema,
 } from "./schemas/image";
 import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
+import userRoutes from "./routes/userRoutes";
+import {
+  paramsUserSchema,
+  replyUserAboutSchema,
+  replyUserAddressSchema,
+  replyUserByIdSchema,
+  replyUserCreditCardSchema,
+  replyUserSchema,
+} from "./schemas/user";
 
 const fastify = Fastify({
   logger: pino({
@@ -64,22 +74,39 @@ fastify.register(fastifySwaggerUI, {
 });
 
 fastify.addSchema({ $id: "Image", ...replyImageSchema });
-fastify.addSchema({ $id: "Folder", ...replyFolderSchema });
 fastify.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
 fastify.addSchema({ $id: "paramsImage", ...paramsImageSchema });
-fastify.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
 fastify.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+
+fastify.addSchema({ $id: "Folder", ...replyFolderSchema });
+fastify.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
 fastify.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
+
+fastify.addSchema({ $id: "User", ...replyUserSchema });
+fastify.addSchema({ $id: "UserById", ...replyUserByIdSchema });
+fastify.addSchema({ $id: "UserAddress", ...replyUserAddressSchema });
+fastify.addSchema({ $id: "UserCreditCard", ...replyUserCreditCardSchema });
+fastify.addSchema({ $id: "UserAbout", ...replyUserAboutSchema });
+fastify.addSchema({ $id: "paramsUser", ...paramsUserSchema });
 
 fastify.register(cors, {
   origin: true,
 });
 
+fastify.register(jwt, {
+  secret: "secret",
+});
+
+fastify.register(userRoutes, { prefix: "/api/v1" });
 fastify.register(imageRoutes, { prefix: "/api/v1" });
 fastify.register(folderRoutes, { prefix: "/api/v1" });
 
-// fastify.get("/", (request, reply) => {
-//   reply.send({ hello: "world" });
+// fastify.setErrorHandler((error, request, reply) => {
+//   reply.send({
+//     statusCode: 500,
+//     error: "Internal Server Error",
+//     message: error.message,
+//   });
 // });
 
 fastify.listen({ port: 8080 }, (err) => {

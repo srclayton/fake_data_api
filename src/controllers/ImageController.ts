@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { GenericController } from "./GenericController";
+import { Controller } from "./Controller";
 
-export class ImageController extends GenericController {
+export class ImageController extends Controller {
   public async getByFolder(request: FastifyRequest, reply: FastifyReply) {
     const { folder } = request.params as { folder: string };
     try {
@@ -17,7 +17,7 @@ export class ImageController extends GenericController {
         items: images,
       });
     } catch (error) {
-      console.error(error);
+      reply.send(error);
       throw error;
     }
   }

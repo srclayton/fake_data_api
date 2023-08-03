@@ -1,4 +1,4 @@
-import fastify, {
+import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyServerOptions,
@@ -16,6 +16,15 @@ import {
   paramsImageByPage,
 } from "./schemas/image";
 import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
+import {
+  replyUserSchema,
+  replyUserByIdSchema,
+  replyUserAddressSchema,
+  replyUserCreditCardSchema,
+  replyUserAboutSchema,
+  paramsUserSchema,
+} from "./schemas/user";
+import userRoutes from "./routes/userRoutes";
 
 export default async function (
   instance: FastifyInstance,
@@ -61,14 +70,24 @@ export default async function (
     },
     transformSpecificationClone: true,
   });
+
   instance.addSchema({ $id: "Image", ...replyImageSchema });
-  instance.addSchema({ $id: "Folder", ...replyFolderSchema });
   instance.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
   instance.addSchema({ $id: "paramsImage", ...paramsImageSchema });
-  instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
   instance.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+
+  instance.addSchema({ $id: "Folder", ...replyFolderSchema });
+  instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
   instance.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
 
+  instance.addSchema({ $id: "User", ...replyUserSchema });
+  instance.addSchema({ $id: "UserById", ...replyUserByIdSchema });
+  instance.addSchema({ $id: "UserAddress", ...replyUserAddressSchema });
+  instance.addSchema({ $id: "UserCreditCard", ...replyUserCreditCardSchema });
+  instance.addSchema({ $id: "UserAbout", ...replyUserAboutSchema });
+  instance.addSchema({ $id: "paramsUser", ...paramsUserSchema });
+
+  instance.register(userRoutes, { prefix: "/api/v1" });
   instance.register(imageRoutes, { prefix: "/api/v1" });
   instance.register(folderRoutes, { prefix: "/api/v1" });
 

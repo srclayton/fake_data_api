@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 // Require the framework
 
 import { FastifyReply, FastifyRequest, fastify } from "fastify";
+import jwt from "@fastify/jwt";
 dotenv.config();
 // Instantiate Fastify with some config
 const app = fastify({
@@ -11,6 +12,10 @@ const app = fastify({
 
 app.register(cors, {
   origin: true,
+});
+
+app.register(jwt, {
+  secret: "secret",
 });
 // Register your application as a normal plugin.
 app.register(import("../src/app"), {
