@@ -5,6 +5,7 @@ import cors from "@fastify/cors";
 import { FastifyReply, FastifyRequest, fastify } from "fastify";
 import jwt from "@fastify/jwt";
 dotenv.config();
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 // Instantiate Fastify with some config
 const app = fastify({
   logger: true,
@@ -15,7 +16,7 @@ app.register(cors, {
 });
 
 app.register(jwt, {
-  secret: "secret",
+  secret: JWT_TOKEN_SECRET as string,
 });
 // Register your application as a normal plugin.
 app.register(import("../src/app"), {

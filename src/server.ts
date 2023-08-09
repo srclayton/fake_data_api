@@ -3,7 +3,7 @@ import pino from "pino";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import cors from "@fastify/cors";
-import jwt from "@fastify/jwt";
+import jwt, { SignOptions } from "@fastify/jwt";
 
 import folderRoutes from "./routes/folderRoutes";
 import imageRoutes from "./routes/imageRoutes";
@@ -17,14 +17,19 @@ import {
 import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
 import userRoutes from "./routes/userRoutes";
 import {
+  bodyUserLoginSchema,
+  bodyUserRefreshSchema,
   paramsUserSchema,
   replyUserAboutSchema,
   replyUserAddressSchema,
   replyUserByIdSchema,
   replyUserCreditCardSchema,
+  replyUserLoginSchema,
+  replyUserRefreshSchema,
   replyUserSchema,
 } from "./schemas/user";
-
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const fastify = Fastify({
   logger: pino({
     transport: {
@@ -38,6 +43,16 @@ fastify.register(fastifySwagger, {
     schemes: ["https", "http"],
     consumes: ["application/json"],
     produces: ["application/json"],
+    securityDefinitions: {
+      Bearer: {
+        type: "apiKey",
+        name: "Authorization",
+        in: "header",
+        description: `Bearer token 
+        Lembre-se de incluir 'Bearer ' antes do token:
+        Exemplo: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`,
+      },
+    },
     info: {
       title: "Fake Data API",
       description:
@@ -82,6 +97,10 @@ fastify.addSchema({ $id: "Folder", ...replyFolderSchema });
 fastify.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
 fastify.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
 
+fastify.addSchema({ $id: "UserLogin", ...bodyUserLoginSchema });
+fastify.addSchema({ $id: "UserLoginReply", ...replyUserLoginSchema });
+fastify.addSchema({ $id: "UserRefresh", ...bodyUserRefreshSchema });
+fastify.addSchema({ $id: "UserRefreshReply", ...replyUserRefreshSchema });
 fastify.addSchema({ $id: "User", ...replyUserSchema });
 fastify.addSchema({ $id: "UserById", ...replyUserByIdSchema });
 fastify.addSchema({ $id: "UserAddress", ...replyUserAddressSchema });
@@ -94,12 +113,49 @@ fastify.register(cors, {
 });
 
 fastify.register(jwt, {
-  secret: "secret",
+  secret: JWT_TOKEN_SECRET as string,
 });
 
 fastify.register(userRoutes, { prefix: "/api/v1" });
 fastify.register(imageRoutes, { prefix: "/api/v1" });
 fastify.register(folderRoutes, { prefix: "/api/v1" });
+
+fastify.addHook("onRequest", (request, reply, done) => {
+  if (
+    request.url !== "/" &&
+    request.hostname !== "localhost:8080" &&
+    request.protocol !== "https"
+  )
+    return reply.code(403).send({ error: "Forbidden" });
+  switch (request.url) {
+    case "/api/v1/refresh": {
+      if (!request.headers.authorization)
+        return reply.code(401).send({ error: "Unauthorized" });
+      const token = request.headers.authorization?.split(" ")[1];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const { _id } = fastify.jwt.verify(
+        token as string,
+        {
+          key: JWT_REFRESH_SECRET,
+        } as unknown as SignOptions
+      );
+      request.headers._id = _id;
+      break;
+    }
+    case "/api/v1/validate": {
+      if (!request.headers.authorization)
+        return reply.code(401).send({ error: "Unauthorized" });
+      const token = request.headers.authorization?.split(" ")[1];
+      const response = fastify.jwt.verify(token as string);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      request.headers.response = response;
+      break;
+    }
+  }
+  done();
+});
 
 // fastify.setErrorHandler((error, request, reply) => {
 //   reply.send({

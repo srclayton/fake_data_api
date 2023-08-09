@@ -73,3 +73,34 @@ export const paramsUserSchema = {
     },
   },
 };
+
+export const bodyUserLoginSchema = {
+  type: "object",
+  properties: {
+    username: { type: "string" },
+    password: { type: "string" },
+  },
+  required: ["username", "password"],
+};
+
+export const replyUserLoginSchema = {
+  type: "object",
+  properties: {
+    access_token: { type: "string", format: "jwt" },
+    refresh_token: { type: "string", format: "jwt" },
+  },
+};
+
+export const bodyUserRefreshSchema = {
+  type: "object",
+  properties: {
+    refresh_token: { type: "string" },
+  },
+};
+
+export const replyUserRefreshSchema = {
+  type: "object",
+  properties: {
+    access_token: { type: "string", format: "jwt" },
+  },
+};

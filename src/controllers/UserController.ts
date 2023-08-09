@@ -13,7 +13,10 @@ export class UserController extends Controller {
       username: user.username,
       name: user.name,
     };
-    const access_token = await fastify.jwt.sign(data, { expiresIn: "25s" });
+    const access_token = await fastify.jwt.sign(data, {
+      expiresIn: "25s",
+    });
+
     return access_token;
   }
 
@@ -22,10 +25,14 @@ export class UserController extends Controller {
     reply: FastifyReply,
     fastify: FastifyInstance
   ) {
+    if (!request.body) return reply.code(400).send({ error: "Bad Request" });
     const { username, password } = request.body as {
       username: string;
       password: string;
     };
+    if (!username || !password)
+      return reply.code(400).send({ error: "Bad Request" });
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const user = await this.model.getUser(username);
@@ -39,9 +46,15 @@ export class UserController extends Controller {
     }
 
     const access_token = await this.getAccessToken(user, fastify);
+
     const refresh_token = await fastify.jwt.sign(
       { _id: user._id },
-      { expiresIn: "1h" }
+      {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        key: process.env.JWT_REFRESH_SECRET as string,
+        expiresIn: "1h",
+      }
     );
 
     reply.code(200).send({
@@ -56,11 +69,8 @@ export class UserController extends Controller {
     fastify: FastifyInstance
   ) {
     try {
-      const token = request.headers.authorization?.split(" ")[1];
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { _id } = await fastify.jwt.verify(token);
-
+      const { _id } = request.headers as { _id: string };
+      if (!_id) return reply.code(400).send({ error: "Bad Request" });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const user = await this.model.getUser(_id.toString());
@@ -76,6 +86,8 @@ export class UserController extends Controller {
     } catch (error) {
       reply.code(401).send({
         error: "Unauthorized",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         message: error.message,
       });
     }

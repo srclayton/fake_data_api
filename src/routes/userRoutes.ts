@@ -27,12 +27,45 @@ export default async (fastify: FastifyInstance) => {
       userController.getAll(request, reply)
   );
 
-  fastify.post("/refresh", async (request, reply) =>
-    userController.refreshToken(request, reply, fastify)
+  fastify.post(
+    "/refresh",
+    {
+      schema: {
+        description:
+          "Um endpoint que permite que os usuários atualizem seus tokens expirados, fornecendo um token de atualização válido. Essa rota verifica o token de atualização, gera um novo token de acesso e o retorna para o cliente, estendendo a sessão de autenticação sem exigir novo login.",
+        tags: ["user"],
+        security: [{ Bearer: [] }],
+        response: {
+          200: {
+            description: "Successful response",
+            $ref: "UserRefreshReply#",
+          },
+        },
+      },
+    },
+    async (request, reply) =>
+      userController.refreshToken(request, reply, fastify)
   );
 
-  fastify.post("/login", async (request, reply) =>
-    userController.verifyUser(request, reply, fastify)
+  fastify.post(
+    "/login",
+    {
+      schema: {
+        description:
+          "Ao receber uma solicitação de login, o servidor verifica as credenciais fornecidas pelo usuário. Se as credenciais estiverem corretas, o servidor gera um token de acesso (um token JWT) que é retornado ao cliente. Esse token é então usado pelo cliente para fazer solicitações futuras ao servidor para acessar recursos protegidos.",
+        tags: ["user"],
+        body: {
+          $ref: "UserLogin#",
+        },
+        response: {
+          200: {
+            description: "Successful response",
+            $ref: "UserLoginReply#",
+          },
+        },
+      },
+    },
+    async (request, reply) => userController.verifyUser(request, reply, fastify)
   );
 
   fastify.get(
@@ -58,8 +91,6 @@ export default async (fastify: FastifyInstance) => {
   );
 
   fastify.get("/validate", async (request, reply) => {
-    const token = request.headers.authorization?.split(" ")[1];
-    const response = fastify.jwt.verify(token as string);
-    reply.send({ response });
+    reply.send({ data: request.headers.response });
   });
 };

@@ -23,9 +23,14 @@ import {
   replyUserCreditCardSchema,
   replyUserAboutSchema,
   paramsUserSchema,
+  bodyUserLoginSchema,
+  bodyUserRefreshSchema,
+  replyUserLoginSchema,
+  replyUserRefreshSchema,
 } from "./schemas/user";
 import userRoutes from "./routes/userRoutes";
-
+import { SignOptions } from "@fastify/jwt";
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 export default async function (
   instance: FastifyInstance,
   opts: FastifyServerOptions,
@@ -36,6 +41,16 @@ export default async function (
       schemes: ["https"],
       consumes: ["application/json"],
       produces: ["application/json"],
+      securityDefinitions: {
+        Bearer: {
+          type: "apiKey",
+          name: "Authorization",
+          in: "header",
+          description: `Bearer token 
+          Lembre-se de incluir 'Bearer ' antes do token:
+          Exemplo: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`,
+        },
+      },
       info: {
         title: "Fake Data API",
         description:
@@ -80,6 +95,11 @@ export default async function (
   instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
   instance.addSchema({ $id: "paramsFolderSchema", ...paramsFolderSchema });
 
+  instance.addSchema({ $id: "UserLogin", ...bodyUserLoginSchema });
+  instance.addSchema({ $id: "UserLoginReply", ...replyUserLoginSchema });
+  instance.addSchema({ $id: "UserRefresh", ...bodyUserRefreshSchema });
+  instance.addSchema({ $id: "UserRefreshReply", ...replyUserRefreshSchema });
+
   instance.addSchema({ $id: "User", ...replyUserSchema });
   instance.addSchema({ $id: "UserById", ...replyUserByIdSchema });
   instance.addSchema({ $id: "UserAddress", ...replyUserAddressSchema });
@@ -96,6 +116,50 @@ export default async function (
   //     hello: "World",
   //   });
   // });
+
+  instance.addHook("onRequest", (request, reply, done) => {
+    if (
+      // request.url !== "/" &&
+      request.url !== "/static/index.html" &&
+      request.url !== "/" &&
+      request.hostname !== "localhost:8080" &&
+      request.headers["x-forwarded-proto"] !== "https"
+    )
+      return reply.code(403).send({
+        error: "Forbidden",
+        url: request.url,
+        hostname: request.hostname,
+        protocol: request.headers["x-forwarded-proto"],
+      });
+    switch (request.url) {
+      case "/api/v1/refresh": {
+        if (!request.headers.authorization)
+          return reply.code(401).send({ error: "Unauthorized" });
+        const token = request.headers.authorization?.split(" ")[1];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const { _id } = instance.jwt.verify(
+          token as string,
+          {
+            key: JWT_REFRESH_SECRET,
+          } as unknown as SignOptions
+        );
+        request.headers._id = _id;
+        break;
+      }
+      case "/api/v1/validate": {
+        if (!request.headers.authorization)
+          return reply.code(401).send({ error: "Unauthorized" });
+        const token = request.headers.authorization?.split(" ")[1];
+        const response = instance.jwt.verify(token as string);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        request.headers.response = response;
+        break;
+      }
+    }
+    done();
+  });
 
   done();
 }
