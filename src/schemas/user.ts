@@ -22,6 +22,7 @@ export const replyUserAboutSchema = {
     job_title: { type: "string", format: "job_title" },
     zodiac_sign: { type: "string", format: "zodiac_sign" },
   },
+  required: ["registered_at", "birthdate", "gender", "zodiac_sign"],
 };
 
 export const replyUserAddressSchema = {
@@ -89,6 +90,7 @@ export const replyUserLoginSchema = {
     access_token: { type: "string", format: "jwt" },
     refresh_token: { type: "string", format: "jwt" },
   },
+  required: ["access_token", "refresh_token"],
 };
 
 export const bodyUserRefreshSchema = {
@@ -96,6 +98,7 @@ export const bodyUserRefreshSchema = {
   properties: {
     refresh_token: { type: "string" },
   },
+  required: ["refresh_token"],
 };
 
 export const replyUserRefreshSchema = {
@@ -103,4 +106,5 @@ export const replyUserRefreshSchema = {
   properties: {
     access_token: { type: "string", format: "jwt" },
   },
+  required: ["access_token"],
 };

@@ -9,6 +9,7 @@ export class Controller {
     ["image", process.env.MONGO_DB_IMAGE_COLLECTION],
     ["folder", process.env.MONGO_DB_FOLDER_COLLECTION],
     ["user", process.env.MONGO_DB_USER_COLLECTION],
+    ["product", process.env.MONGO_DB_PRODUCT_COLLECTION],
   ]);
 
   private limit = 25;
@@ -70,7 +71,10 @@ export class Controller {
 
     const total_pages = Math.ceil(total_items / this.limit);
     if (page > total_pages) {
-      reply.code(404).send({ error: "Not Found" });
+      reply.code(404).send({
+        error: "Not Found",
+        message: `Value must be <= ${total_pages}, actual value ${page}`,
+      });
       return;
     }
 

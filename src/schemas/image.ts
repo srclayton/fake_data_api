@@ -39,12 +39,3 @@ export const paramsImageByFolderSchema = {
     },
   },
 };
-export const paramsImageByPage = {
-  type: "object",
-  properties: {
-    page: {
-      type: "number",
-      description: "Numero da pagina",
-    },
-  },
-};

@@ -11,7 +11,6 @@ import {
   replyImageByFolderSchema,
   paramsImageSchema,
   paramsImageByFolderSchema,
-  paramsImageByPage,
   replyImageSchema,
 } from "./schemas/image";
 import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
@@ -28,6 +27,9 @@ import {
   replyUserRefreshSchema,
   replyUserSchema,
 } from "./schemas/user";
+import productRoutes from "./routes/productRoutes";
+import { paramsByPage } from "./schemas/general";
+import { replyProductByIdSchema, replyProductSchema } from "./schemas/product";
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const fastify = Fastify({
@@ -91,7 +93,7 @@ fastify.register(fastifySwaggerUI, {
 fastify.addSchema({ $id: "Image", ...replyImageSchema });
 fastify.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
 fastify.addSchema({ $id: "paramsImage", ...paramsImageSchema });
-fastify.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+fastify.addSchema({ $id: "paramsPage", ...paramsByPage });
 
 fastify.addSchema({ $id: "Folder", ...replyFolderSchema });
 fastify.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
@@ -108,6 +110,8 @@ fastify.addSchema({ $id: "UserCreditCard", ...replyUserCreditCardSchema });
 fastify.addSchema({ $id: "UserAbout", ...replyUserAboutSchema });
 fastify.addSchema({ $id: "paramsUser", ...paramsUserSchema });
 
+fastify.addSchema({ $id: "Product", ...replyProductSchema });
+fastify.addSchema({ $id: "ProductById", ...replyProductByIdSchema });
 fastify.register(cors, {
   origin: true,
 });
@@ -116,6 +120,7 @@ fastify.register(jwt, {
   secret: JWT_TOKEN_SECRET as string,
 });
 
+fastify.register(productRoutes, { prefix: "/api/v1" });
 fastify.register(userRoutes, { prefix: "/api/v1" });
 fastify.register(imageRoutes, { prefix: "/api/v1" });
 fastify.register(folderRoutes, { prefix: "/api/v1" });

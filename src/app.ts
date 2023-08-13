@@ -13,7 +13,6 @@ import {
   replyImageByFolderSchema,
   paramsImageSchema,
   paramsImageByFolderSchema,
-  paramsImageByPage,
 } from "./schemas/image";
 import { paramsFolderSchema, replyFolderSchema } from "./schemas/folder";
 import {
@@ -30,6 +29,9 @@ import {
 } from "./schemas/user";
 import userRoutes from "./routes/userRoutes";
 import { SignOptions } from "@fastify/jwt";
+import { paramsByPage } from "./schemas/general";
+import productRoutes from "./routes/productRoutes";
+import { replyProductSchema, replyProductByIdSchema } from "./schemas/product";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 export default async function (
   instance: FastifyInstance,
@@ -89,7 +91,7 @@ export default async function (
   instance.addSchema({ $id: "Image", ...replyImageSchema });
   instance.addSchema({ $id: "ImageByFolder", ...replyImageByFolderSchema });
   instance.addSchema({ $id: "paramsImage", ...paramsImageSchema });
-  instance.addSchema({ $id: "paramsPage", ...paramsImageByPage });
+  instance.addSchema({ $id: "paramsPage", ...paramsByPage });
 
   instance.addSchema({ $id: "Folder", ...replyFolderSchema });
   instance.addSchema({ $id: "paramsFolder", ...paramsImageByFolderSchema });
@@ -107,6 +109,10 @@ export default async function (
   instance.addSchema({ $id: "UserAbout", ...replyUserAboutSchema });
   instance.addSchema({ $id: "paramsUser", ...paramsUserSchema });
 
+  instance.addSchema({ $id: "Product", ...replyProductSchema });
+  instance.addSchema({ $id: "ProductById", ...replyProductByIdSchema });
+
+  instance.register(productRoutes, { prefix: "/api/v1" });
   instance.register(userRoutes, { prefix: "/api/v1" });
   instance.register(imageRoutes, { prefix: "/api/v1" });
   instance.register(folderRoutes, { prefix: "/api/v1" });

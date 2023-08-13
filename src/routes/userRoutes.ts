@@ -90,6 +90,34 @@ export default async (fastify: FastifyInstance) => {
     async (request, reply) => userController.getById(request, reply)
   );
 
+  fastify.get(
+    "/user/page/:page",
+    {
+      schema: {
+        description:
+          "GET /user/page/:page: Retorna uma lista de usuários disponíveis na API. Cada usuário pode conter informações como ID, nome e outros detalhes relevantes.",
+        tags: ["user"],
+        params: {
+          $ref: "paramsPage#",
+        },
+        response: {
+          200: {
+            description: "Successful response",
+            type: "object",
+            properties: {
+              current_page: { type: "number" },
+              current_items: { type: "number" },
+              total_pages: { type: "number" },
+              total_items: { type: "number" },
+              items: { type: "array", items: { $ref: "User#" } },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => userController.getByPage(request, reply)
+  );
+
   fastify.get("/validate", async (request, reply) => {
     reply.send({ data: request.headers.response });
   });
