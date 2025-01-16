@@ -126,12 +126,12 @@ fastify.register(imageRoutes, { prefix: "/api/v1" });
 fastify.register(folderRoutes, { prefix: "/api/v1" });
 
 fastify.addHook("onRequest", (request, reply, done) => {
-  if (
-    request.url !== "/" &&
-    request.hostname !== "localhost:8080" &&
-    request.protocol !== "https"
-  )
-    return reply.code(403).send({ error: "Forbidden" });
+  // if (
+  //   request.url !== "/" &&
+  //   request.hostname !== "localhost:8080" &&
+  //   request.protocol !== "https"
+  // )
+  //   return reply.code(403).send({ error: "Forbidden" });
   switch (request.url) {
     case "/api/v1/refresh": {
       if (!request.headers.authorization)
@@ -170,6 +170,6 @@ fastify.addHook("onRequest", (request, reply, done) => {
 //   });
 // });
 
-fastify.listen({ port: 8080 }, (err) => {
+fastify.listen({ port: 5002, host:"0.0.0.0" }, (err) => {
   if (err) throw err;
 });
